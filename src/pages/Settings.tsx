@@ -1,21 +1,30 @@
 import { useEffect, useState } from 'react'
-import { Bell, Download, Moon, Sun, Monitor } from 'lucide-react'
+import { Bell, Download, Moon, Sun, Monitor, Vibrate } from 'lucide-react'
 import { useSettingsStore } from '../stores/useAppStores'
 import { Button, Input, PageHeader, Select } from '../components/ui'
-import { requestNotificationPermission } from '../lib/reminders'
+import {
+  getNotificationPermissionLabel,
+  requestNotificationPermission,
+  sendTestNotification,
+  resyncPendingNotifications,
+} from '../lib/reminders'
 import { db } from '../db'
 import { cn } from '../lib/utils'
 
 export function SettingsPage() {
   const { settings, stats, load, update } = useSettingsStore()
   const [name, setName] = useState('')
-  const [perm, setPerm] = useState(
-    typeof Notification !== 'undefined' ? Notification.permission : 'default',
-  )
+  const [perm, setPerm] = useState('…')
+  const [testMsg, setTestMsg] = useState<string | null>(null)
+  const [testing, setTesting] = useState(false)
 
   useEffect(() => {
     if (settings) setName(settings.userName)
   }, [settings])
+
+  useEffect(() => {
+    void getNotificationPermissionLabel().then(setPerm)
+  }, [])
 
   if (!settings) return null
 
@@ -47,6 +56,30 @@ export function SettingsPage() {
     { id: 'system' as const, icon: Monitor, label: 'System' },
   ]
 
+  async function enableReminders() {
+    const ok = await requestNotificationPermission()
+    setPerm(await getNotificationPermissionLabel())
+    await update({ notificationsEnabled: ok })
+    if (ok) await resyncPendingNotifications()
+    await load()
+    setTestMsg(
+      ok
+        ? 'Reminders enabled. Deadlines get alerts at 30 minutes before, at due time, and when overdue.'
+        : 'Could not enable notifications. Check system permission for Priora.',
+    )
+  }
+
+  async function runTest() {
+    setTesting(true)
+    setTestMsg(null)
+    const result = await sendTestNotification()
+    setPerm(await getNotificationPermissionLabel())
+    if (result.ok) await update({ notificationsEnabled: true })
+    setTestMsg(result.message)
+    setTesting(false)
+    await load()
+  }
+
   return (
     <div className="max-w-lg">
       <PageHeader title="Settings" subtitle="Private · offline · yours" />
@@ -54,7 +87,7 @@ export function SettingsPage() {
       <section className="space-y-5">
         <div>
           <label className="text-sm font-medium mb-1.5 block">Your name</label>
-        <div className="flex flex-col sm:flex-row gap-2">
+          <div className="flex flex-col sm:flex-row gap-2">
             <Input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -127,30 +160,45 @@ export function SettingsPage() {
           </Select>
         </div>
 
-        <div className="surface rounded-2xl p-4">
-          <div className="flex items-center justify-between gap-3">
-            <div className="flex items-start gap-3">
-              <Bell size={18} className="accent mt-0.5" />
-              <div>
-                <p className="font-medium text-sm">Local reminders</p>
-                <p className="text-xs text-muted mt-0.5">
-                  Permission: {perm}. No cloud. Stored on this device.
-                </p>
-              </div>
+        <div className="surface rounded-2xl p-4 space-y-3">
+          <div className="flex items-start gap-3">
+            <Bell size={18} className="accent mt-0.5 shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="font-medium text-sm">Local reminders</p>
+              <p className="text-xs text-muted mt-0.5">
+                Permission: <span className="font-medium text-[var(--fg)]">{perm}</span>
+                {settings.notificationsEnabled ? ' · on' : ' · off'}
+              </p>
+              <p className="text-xs text-muted mt-2">
+                For each task with a deadline you get: 1 day before, 2 hours before,{' '}
+                <span className="font-medium text-[var(--fg)]">30 minutes before</span>, at
+                deadline, then overdue follow-ups. Stored on this device — no cloud.
+              </p>
             </div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-2">
             <Button
               size="sm"
               variant="secondary"
-              onClick={async () => {
-                const ok = await requestNotificationPermission()
-                setPerm(Notification.permission)
-                await update({ notificationsEnabled: ok })
-                await load()
-              }}
+              className="flex-1"
+              onClick={() => void enableReminders()}
             >
-              Enable
+              <Bell size={14} /> Enable reminders
+            </Button>
+            <Button
+              size="sm"
+              className="flex-1"
+              disabled={testing}
+              onClick={() => void runTest()}
+            >
+              <Vibrate size={14} /> {testing ? 'Sending…' : 'Send test'}
             </Button>
           </div>
+          {testMsg && (
+            <p className="text-xs rounded-xl px-3 py-2 bg-accent-soft text-[var(--fg)]">
+              {testMsg}
+            </p>
+          )}
         </div>
 
         <div className="surface rounded-2xl p-4">
@@ -162,7 +210,7 @@ export function SettingsPage() {
           </p>
         </div>
 
-        <Button variant="secondary" className="w-full" onClick={exportData}>
+        <Button variant="secondary" className="w-full" onClick={() => void exportData()}>
           <Download size={16} /> Export local backup
         </Button>
 

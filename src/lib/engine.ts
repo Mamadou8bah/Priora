@@ -145,9 +145,9 @@ export function defaultReminderOffsets(deadline: string) {
   const dl = parseISO(deadline).getTime()
   const now = Date.now()
   const offsets = [
-    { label: '1 day before', offsetMinutes: -24 * 60 },
-    { label: '2 hours before', offsetMinutes: -120 },
     { label: '30 minutes before', offsetMinutes: -30 },
+    { label: '2 hours before', offsetMinutes: -120 },
+    { label: '1 day before', offsetMinutes: -24 * 60 },
     { label: 'At deadline', offsetMinutes: 0 },
     { label: '30 min overdue', offsetMinutes: 30 },
     { label: '2 hours overdue', offsetMinutes: 120 },

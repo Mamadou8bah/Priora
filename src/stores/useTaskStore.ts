@@ -97,7 +97,14 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
   update: async (id, patch) => {
     await db.tasks.update(id, { ...patch, updatedAt: nowISO() })
     const task = await db.tasks.get(id)
-    if (task && (patch.deadline !== undefined || patch.reminderOffsets !== undefined)) {
+    if (
+      task &&
+      (patch.deadline !== undefined ||
+        patch.reminderOffsets !== undefined ||
+        patch.priority !== undefined ||
+        patch.status !== undefined ||
+        patch.title !== undefined)
+    ) {
       await scheduleRemindersForTask(task)
     }
     await get().load()
@@ -118,6 +125,7 @@ export const useTaskStore = create<TaskStore>((set, get) => ({
       updatedAt: nowISO(),
     })
     await bumpStats(task)
+    await scheduleRemindersForTask({ ...task, status: 'completed' })
     const { useGameStore } = await import('./useGameStore')
     await useGameStore.getState().onTaskCompleted(task)
     await get().load()
