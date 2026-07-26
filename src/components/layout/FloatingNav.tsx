@@ -249,7 +249,7 @@ export function FloatingNav() {
         <button
           type="button"
           aria-label="Close menu"
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-[2px] animate-nav-scrim"
+          className="fixed inset-0 z-40 bg-black/30 animate-nav-scrim"
           onClick={() => setMoreOpen(false)}
         />
       )}
@@ -265,15 +265,15 @@ export function FloatingNav() {
         <div
           ref={moreRef}
           className={cn(
-            'pointer-events-auto mb-3 w-full max-w-md origin-bottom',
-            'transition-[transform,opacity,filter] duration-[400ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
+            'pointer-events-auto mb-3 w-full max-w-sm sm:max-w-md origin-bottom',
+            'transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
             moreOpen
-              ? 'opacity-100 scale-100 translate-y-0 blur-0'
-              : 'opacity-0 scale-95 translate-y-4 blur-sm pointer-events-none invisible absolute',
+              ? 'opacity-100 scale-100 translate-y-0'
+              : 'opacity-0 scale-95 translate-y-3 pointer-events-none invisible absolute',
           )}
           aria-hidden={!moreOpen}
         >
-          <div className="float-dock rounded-[1.75rem] p-3">
+          <div className="float-dock rounded-3xl p-3">
             <div className="flex items-center justify-between px-2 mb-2">
               <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
                 Navigate
@@ -301,7 +301,7 @@ export function FloatingNav() {
                     className={cn(
                       'nav-more-item flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[11px] font-medium transition',
                       active
-                        ? 'bg-accent text-[var(--accent-fg)] shadow-[var(--glass-shine)]'
+                        ? 'bg-accent text-[var(--accent-fg)]'
                         : 'text-muted hover:bg-accent-soft hover:text-[var(--fg)]',
                     )}
                     style={{ animationDelay: `${i * 35}ms` }}
@@ -324,7 +324,6 @@ export function FloatingNav() {
             aria-hidden
             className={cn(
               'nav-pill absolute top-1.5 bottom-1.5 rounded-full bg-[var(--accent)]',
-              'shadow-[var(--glass-shine)]',
               pill.ready ? 'opacity-100' : 'opacity-0',
             )}
             style={{
@@ -423,15 +422,15 @@ export function FloatingNav() {
 
 export function FloatingTopBar() {
   return (
-    <header className="sticky top-0 z-30 flex justify-center px-3 sm:px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pointer-events-none">
-      <div className="pointer-events-auto float-dock w-full max-w-6xl flex items-center justify-between gap-3 rounded-2xl px-4 py-2.5">
+    <header className="sticky top-0 z-30 flex justify-center px-3 sm:px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pointer-events-none bg-[var(--bg)]/95">
+      <div className="pointer-events-auto float-dock w-full max-w-6xl flex items-center justify-between gap-2 sm:gap-3 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5">
         <NavLink to="/" end className="min-w-0" onClick={() => void tap()} aria-label="Priora home">
-          <BrandWordmark markSize={28} />
+          <BrandWordmark markSize={26} />
         </NavLink>
         <NavLink
           to="/search"
           onClick={() => void tap()}
-          className="p-2.5 rounded-xl text-muted hover:bg-accent-soft hover:text-[var(--fg)] transition active:scale-95"
+          className="p-2 sm:p-2.5 rounded-xl text-muted hover:bg-accent-soft hover:text-[var(--fg)] transition active:scale-95"
           aria-label="Search"
         >
           <Search size={20} strokeWidth={1.75} />

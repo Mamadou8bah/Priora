@@ -37,9 +37,8 @@ export function TasksPage() {
         }
       />
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-5">
         <Select
-          className="w-auto min-w-36"
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
         >
@@ -53,7 +52,6 @@ export function TasksPage() {
           <option value="completed">Completed</option>
         </Select>
         <Select
-          className="w-auto min-w-36"
           value={priorityFilter}
           onChange={(e) => setPriorityFilter(e.target.value)}
         >

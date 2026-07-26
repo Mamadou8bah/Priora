@@ -123,7 +123,7 @@ export async function seedDatabase() {
     try {
       await db.settings.add({
         id: 'main',
-        theme: 'system',
+        theme: 'light',
         userName: '',
         dailyGoal: 5,
         pomodoroMinutes: 25,

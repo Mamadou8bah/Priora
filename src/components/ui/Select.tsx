@@ -246,11 +246,11 @@ export function Select({
         onKeyDown={onTriggerKeyDown}
         className={cn(
           'group relative flex h-11 w-full items-center gap-2 rounded-2xl border border-[var(--border)]',
-          'bg-[var(--card)] backdrop-blur-2xl px-3.5 pr-10 text-left text-sm text-[var(--fg)]',
-          'shadow-[var(--glass-shine)] outline-none transition duration-200',
-          'hover:border-[var(--fg)]/20 hover:bg-[var(--card-solid)]',
-          'focus-visible:border-[var(--fg)]/25 focus-visible:ring-2 focus-visible:ring-[var(--accent-soft)]',
-          open && 'border-[var(--fg)]/25 ring-2 ring-[var(--accent-soft)] bg-[var(--card-solid)]',
+          'bg-[var(--card)] px-3.5 pr-10 text-left text-sm text-[var(--fg)]',
+          'shadow-[var(--shadow-sm)] outline-none transition duration-200',
+          'hover:border-[var(--border-dark)] hover:bg-[var(--accent-soft)]',
+          'focus-visible:border-[var(--border-dark)] focus-visible:ring-2 focus-visible:ring-[var(--accent-soft)]',
+          open && 'border-[var(--border-dark)] ring-2 ring-[var(--accent-soft)] bg-[var(--accent-soft)]',
           disabled && 'opacity-50 pointer-events-none',
           isPlaceholder && 'text-muted',
         )}
@@ -295,7 +295,7 @@ export function Select({
                     'flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm transition',
                     'disabled:opacity-40 disabled:pointer-events-none',
                     isSelected
-                      ? 'bg-accent text-[var(--accent-fg)] shadow-[var(--glass-shine)]'
+                      ? 'bg-accent text-[var(--accent-fg)]'
                       : isActive
                         ? 'bg-accent-soft text-[var(--fg)]'
                         : 'text-[var(--fg)] hover:bg-accent-soft',

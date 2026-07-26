@@ -188,7 +188,7 @@ export function TaskForm({
         value={notes}
         onChange={(e) => setNotes(e.target.value)}
       />
-      <div className="sticky bottom-0 z-10 -mx-1 mt-1 flex justify-end gap-2 bg-[linear-gradient(to_top,var(--card-solid)_55%,transparent)] pt-4 pb-1">
+      <div className="sticky bottom-0 z-10 -mx-1 mt-1 flex justify-end gap-2 border-t border-[var(--border)] bg-[var(--card)] pt-3 pb-1">
         {onCancel && (
           <Button type="button" variant="ghost" onClick={onCancel}>
             Cancel

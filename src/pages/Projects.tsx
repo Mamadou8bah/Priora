@@ -180,7 +180,7 @@ export function ProjectsPage() {
               />
             </div>
           </div>
-          <div className="sticky bottom-0 z-10 flex flex-wrap gap-2 justify-end bg-[linear-gradient(to_top,var(--card-solid)_55%,transparent)] pt-4 pb-1">
+          <div className="sticky bottom-0 z-10 flex flex-wrap gap-2 justify-end border-t border-[var(--border)] bg-[var(--card)] pt-3 pb-1">
             {editing && (
               <Button
                 type="button"

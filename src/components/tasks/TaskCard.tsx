@@ -135,7 +135,7 @@ export function QuickCapture({
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
-        className="h-12 w-full rounded-2xl border border-[var(--border)] bg-[var(--card)] backdrop-blur-2xl pl-4 pr-24 text-[var(--fg)] outline-none transition placeholder:text-muted shadow-[var(--glass-shine)] focus:border-[var(--fg)]/25 focus:ring-2 focus:ring-[var(--accent-soft)]"
+        className="h-12 w-full rounded-2xl border border-[var(--border)] bg-[var(--card)] pl-4 pr-24 text-[var(--fg)] outline-none transition placeholder:text-muted shadow-[var(--shadow-sm)] focus:border-[var(--border-dark)] focus:ring-2 focus:ring-[var(--accent-soft)]"
       />
       <Button
         type="submit"

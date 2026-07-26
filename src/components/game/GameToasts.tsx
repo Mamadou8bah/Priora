@@ -9,7 +9,7 @@ export function GameToasts() {
   if (!toasts.length) return null
 
   return (
-    <div className="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[min(100%-2rem,20rem)] pointer-events-none">
+    <div className="fixed top-[max(0.75rem,env(safe-area-inset-top))] inset-x-3 sm:inset-x-auto sm:right-4 z-[100] flex flex-col gap-2 w-auto sm:w-[min(100%-2rem,20rem)] pointer-events-none mx-auto sm:mx-0 max-w-sm sm:max-w-none">
       {toasts.map((t) => (
         <button
           key={t.id}

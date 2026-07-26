@@ -163,34 +163,26 @@ export function Dashboard() {
       </div>
 
       {recommendation && (
-        <section className="surface rounded-3xl p-5 sm:p-6 relative overflow-hidden animate-fade-up">
-          <div
-            className="absolute inset-0 opacity-40 pointer-events-none"
-            style={{
-              background:
-                'radial-gradient(ellipse at 90% 20%, var(--accent-soft), transparent 55%)',
-            }}
-          />
-          <div className="relative">
-            <p className="text-xs font-semibold uppercase tracking-wider accent mb-2">
-              Suggested next
-            </p>
-            <h2 className="font-display text-2xl font-bold mb-2">
-              {recommendation.task.title}
-            </h2>
-            <p className="text-muted text-sm mb-4">{recommendation.reason}</p>
-            <div className="flex flex-wrap gap-2">
-              <Link to={`/focus?task=${recommendation.task.id}`}>
-                <Button
-                  onClick={() => setFocusTask(recommendation.task.id)}
-                >
-                  <Timer size={16} /> Start focus
-                </Button>
-              </Link>
-              <Button variant="secondary" onClick={() => setEditing(recommendation.task)}>
-                Details
+        <section className="surface rounded-2xl sm:rounded-3xl p-4 sm:p-6 animate-fade-up">
+          <p className="text-xs font-semibold uppercase tracking-wider accent mb-2">
+            Suggested next
+          </p>
+          <h2 className="font-display text-xl sm:text-2xl font-bold mb-2">
+            {recommendation.task.title}
+          </h2>
+          <p className="text-muted text-sm mb-4">{recommendation.reason}</p>
+          <div className="flex flex-wrap gap-2">
+            <Link to={`/focus?task=${recommendation.task.id}`} className="flex-1 sm:flex-none">
+              <Button
+                className="w-full sm:w-auto"
+                onClick={() => setFocusTask(recommendation.task.id)}
+              >
+                <Timer size={16} /> Start focus
               </Button>
-            </div>
+            </Link>
+            <Button variant="secondary" onClick={() => setEditing(recommendation.task)}>
+              Details
+            </Button>
           </div>
         </section>
       )}
