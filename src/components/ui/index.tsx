@@ -2,12 +2,13 @@ import type {
   ButtonHTMLAttributes,
   InputHTMLAttributes,
   ReactNode,
-  SelectHTMLAttributes,
   TextareaHTMLAttributes,
 } from 'react'
 import { useEffect, useRef } from 'react'
 import { cn } from '../../lib/utils'
 import { lockOverlay, unlockOverlay } from '../../lib/overlay'
+
+export { Select } from './Select'
 
 export function Button({
   className,
@@ -67,24 +68,6 @@ export function Textarea({
       )}
       {...props}
     />
-  )
-}
-
-export function Select({
-  className,
-  children,
-  ...props
-}: SelectHTMLAttributes<HTMLSelectElement>) {
-  return (
-    <select
-      className={cn(
-        'h-11 w-full rounded-2xl border border-[var(--border)] bg-[var(--card)] backdrop-blur-2xl px-3.5 text-[var(--fg)] outline-none transition shadow-[var(--glass-shine)] focus:border-[var(--fg)]/25 focus:ring-2 focus:ring-[var(--accent-soft)]',
-        className,
-      )}
-      {...props}
-    >
-      {children}
-    </select>
   )
 }
 
