@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  type ComponentType,
-} from 'react'
+import { useEffect, useRef, useState, type ComponentType } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   Inbox,
@@ -18,7 +11,7 @@ import {
   Search,
   Trophy,
   Gamepad2,
-  Ellipsis,
+  Menu,
   X,
 } from 'lucide-react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
@@ -51,12 +44,7 @@ function HomeIcon({ size = 24, strokeWidth = 1.5, className }: IconProps) {
         strokeWidth={strokeWidth}
         strokeLinecap="round"
       />
-      <path
-        d="M15 18H9"
-        stroke="currentColor"
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-      />
+      <path d="M15 18H9" stroke="currentColor" strokeWidth={strokeWidth} strokeLinecap="round" />
     </svg>
   )
 }
@@ -87,7 +75,7 @@ function ClockIcon({ size = 24, strokeWidth = 1.75, className }: IconProps) {
   )
 }
 
-const PRIMARY: NavItem[] = [
+const TABS: NavItem[] = [
   { to: '/', label: 'Home', icon: HomeIcon, end: true },
   { to: '/tasks', label: 'Tasks', icon: TasksIcon },
   { to: '/forge', label: 'Forge', icon: Trophy },
@@ -106,11 +94,6 @@ const MORE: NavItem[] = [
   { to: '/settings', label: 'Settings', icon: Settings },
 ]
 
-const DESKTOP_EXTRA: NavItem[] = [
-  { to: '/kanban', label: 'Board', icon: Columns3 },
-  { to: '/inbox', label: 'Inbox', icon: Inbox },
-]
-
 async function tap() {
   if (!Capacitor.isNativePlatform()) return
   try {
@@ -125,92 +108,15 @@ function pathMatches(pathname: string, to: string, end?: boolean) {
   return pathname === to || pathname.startsWith(`${to}/`)
 }
 
-function useScrollHide(threshold = 8) {
-  const [hidden, setHidden] = useState(false)
-  const lastY = useRef(0)
-  const ticking = useRef(false)
-
-  useEffect(() => {
-    lastY.current = window.scrollY
-
-    const onScroll = () => {
-      if (ticking.current) return
-      ticking.current = true
-      requestAnimationFrame(() => {
-        const y = window.scrollY
-        const delta = y - lastY.current
-        if (y < 48) setHidden(false)
-        else if (delta > threshold) setHidden(true)
-        else if (delta < -threshold) setHidden(false)
-        lastY.current = y
-        ticking.current = false
-      })
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [threshold])
-
-  return hidden
-}
-
 export function FloatingNav() {
   const location = useLocation()
-  const scrollHidden = useScrollHide()
   const overlayOpen = useOverlayOpen()
   const keyboardOpen = useKeyboardOpen()
   const [moreOpen, setMoreOpen] = useState(false)
-  const [pill, setPill] = useState({ x: 0, w: 0, ready: false })
-  const dockRef = useRef<HTMLDivElement>(null)
-  const itemRefs = useRef<(HTMLAnchorElement | HTMLButtonElement | null)[]>([])
-  const moreRef = useRef<HTMLDivElement>(null)
+  const sheetRef = useRef<HTMLDivElement>(null)
 
   const moreActive = MORE.some((item) => pathMatches(location.pathname, item.to))
-
-  const [wide, setWide] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)')
-    const sync = () => setWide(mq.matches)
-    sync()
-    mq.addEventListener('change', sync)
-    return () => mq.removeEventListener('change', sync)
-  }, [])
-
-  const items = wide
-    ? [...PRIMARY.slice(0, 2), ...DESKTOP_EXTRA, ...PRIMARY.slice(2)]
-    : PRIMARY
-
-  const activeIndex = items.findIndex((item) =>
-    pathMatches(location.pathname, item.to, item.end),
-  )
-  const showMorePill = moreActive && activeIndex < 0
-
-  const measure = useCallback(() => {
-    const dock = dockRef.current
-    if (!dock) return
-    const targetIndex = showMorePill ? items.length : activeIndex
-    const el = itemRefs.current[targetIndex]
-    if (!el || targetIndex < 0) {
-      setPill((p) => ({ ...p, ready: false }))
-      return
-    }
-    const dockBox = dock.getBoundingClientRect()
-    const box = el.getBoundingClientRect()
-    setPill({
-      x: box.left - dockBox.left,
-      w: box.width,
-      ready: true,
-    })
-  }, [activeIndex, items.length, showMorePill])
-
-  useLayoutEffect(() => {
-    measure()
-  }, [measure, location.pathname, wide, moreOpen])
-
-  useEffect(() => {
-    window.addEventListener('resize', measure)
-    return () => window.removeEventListener('resize', measure)
-  }, [measure])
+  const hidden = overlayOpen || keyboardOpen
 
   useEffect(() => {
     setMoreOpen(false)
@@ -225,23 +131,9 @@ export function FloatingNav() {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setMoreOpen(false)
     }
-    const onPointer = (e: MouseEvent | TouchEvent) => {
-      const t = e.target as Node
-      if (moreRef.current?.contains(t) || dockRef.current?.contains(t)) return
-      setMoreOpen(false)
-    }
     document.addEventListener('keydown', onKey)
-    document.addEventListener('mousedown', onPointer)
-    document.addEventListener('touchstart', onPointer)
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.removeEventListener('mousedown', onPointer)
-      document.removeEventListener('touchstart', onPointer)
-    }
+    return () => document.removeEventListener('keydown', onKey)
   }, [moreOpen])
-
-  const dockHidden =
-    overlayOpen || keyboardOpen || (scrollHidden && !moreOpen)
 
   return (
     <>
@@ -249,90 +141,73 @@ export function FloatingNav() {
         <button
           type="button"
           aria-label="Close menu"
-          className="fixed inset-0 z-40 bg-black/30 animate-nav-scrim"
+          className="fixed inset-0 z-40 bg-black/40 animate-nav-scrim"
           onClick={() => setMoreOpen(false)}
         />
       )}
 
+      {/* More sheet */}
       <div
+        ref={sheetRef}
         className={cn(
-          'fixed inset-x-0 bottom-0 z-50 flex flex-col items-center pointer-events-none safe-bottom px-3 sm:px-4',
-          'transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]',
-          dockHidden && 'translate-y-[calc(100%+1.5rem)] opacity-0 pointer-events-none',
+          'fixed inset-x-0 z-[45] mx-auto w-full max-w-lg px-3',
+          'bottom-[calc(3.75rem+env(safe-area-inset-bottom))]',
+          'transition-[transform,opacity] duration-200 ease-out',
+          moreOpen && !hidden
+            ? 'opacity-100 translate-y-0'
+            : 'opacity-0 translate-y-3 pointer-events-none',
         )}
-        aria-hidden={dockHidden}
+        aria-hidden={!moreOpen}
       >
-        <div
-          ref={moreRef}
-          className={cn(
-            'pointer-events-auto mb-3 w-full max-w-sm sm:max-w-md origin-bottom',
-            'transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
-            moreOpen
-              ? 'opacity-100 scale-100 translate-y-0'
-              : 'opacity-0 scale-95 translate-y-3 pointer-events-none invisible absolute',
-          )}
-          aria-hidden={!moreOpen}
-        >
-          <div className="float-dock rounded-3xl p-3">
-            <div className="flex items-center justify-between px-2 mb-2">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">
-                Navigate
-              </span>
-              <button
-                type="button"
-                onClick={() => setMoreOpen(false)}
-                className="p-1.5 rounded-xl text-muted hover:bg-accent-soft hover:text-[var(--fg)] transition"
-                aria-label="Close"
-              >
-                <X size={16} strokeWidth={2} />
-              </button>
-            </div>
-            <div className="grid grid-cols-3 gap-1.5">
-              {MORE.filter(
-                (item) => !wide || !DESKTOP_EXTRA.some((d) => d.to === item.to),
-              ).map((item, i) => {
-                const active = pathMatches(location.pathname, item.to)
-                const Icon = item.icon
-                return (
-                  <NavLink
-                    key={item.to}
-                    to={item.to}
-                    onClick={() => void tap()}
-                    className={cn(
-                      'nav-more-item flex flex-col items-center gap-1.5 rounded-2xl px-2 py-3 text-[11px] font-medium transition',
-                      active
-                        ? 'bg-accent text-[var(--accent-fg)]'
-                        : 'text-muted hover:bg-accent-soft hover:text-[var(--fg)]',
-                    )}
-                    style={{ animationDelay: `${i * 35}ms` }}
-                  >
-                    <Icon size={20} strokeWidth={1.75} />
-                    <span>{item.label}</span>
-                  </NavLink>
-                )
-              })}
-            </div>
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card)] shadow-[var(--shadow)] overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
+            <p className="text-sm font-semibold">More</p>
+            <button
+              type="button"
+              onClick={() => setMoreOpen(false)}
+              className="p-1.5 rounded-lg text-muted hover:bg-accent-soft hover:text-[var(--fg)]"
+              aria-label="Close"
+            >
+              <X size={18} />
+            </button>
+          </div>
+          <div className="grid grid-cols-3 gap-1 p-2 max-h-[50dvh] overflow-y-auto scrollbar-thin">
+            {MORE.map((item) => {
+              const active = pathMatches(location.pathname, item.to)
+              const Icon = item.icon
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  onClick={() => void tap()}
+                  className={cn(
+                    'flex flex-col items-center gap-1.5 rounded-xl px-2 py-3 text-[11px] font-medium transition',
+                    active
+                      ? 'bg-accent text-[var(--accent-fg)]'
+                      : 'text-[var(--fg-muted)] hover:bg-accent-soft hover:text-[var(--fg)]',
+                  )}
+                >
+                  <Icon size={20} strokeWidth={1.75} />
+                  <span>{item.label}</span>
+                </NavLink>
+              )
+            })}
           </div>
         </div>
+      </div>
 
-        <nav
-          ref={dockRef}
-          className="pointer-events-auto relative float-dock mx-auto flex items-center justify-center rounded-full p-1.5 mb-2"
-          aria-label="Primary"
-        >
-          <span
-            aria-hidden
-            className={cn(
-              'nav-pill absolute top-1.5 bottom-1.5 rounded-full bg-[var(--accent)]',
-              pill.ready ? 'opacity-100' : 'opacity-0',
-            )}
-            style={{
-              width: pill.w,
-              transform: `translateX(${pill.x}px)`,
-            }}
-          />
-
-          {items.map((item, i) => {
+      {/* Bottom tab bar */}
+      <nav
+        className={cn(
+          'fixed inset-x-0 bottom-0 z-50 border-t border-[var(--border)] bg-[var(--card)]',
+          'safe-bottom',
+          hidden && 'invisible pointer-events-none',
+        )}
+        aria-label="Primary"
+        aria-hidden={hidden}
+      >
+        <div className="mx-auto flex max-w-lg h-14 items-stretch">
+          {TABS.map((item) => {
             const Icon = item.icon
             const active = pathMatches(location.pathname, item.to, item.end)
             return (
@@ -340,100 +215,68 @@ export function FloatingNav() {
                 key={item.to}
                 to={item.to}
                 end={item.end}
-                ref={(el) => {
-                  itemRefs.current[i] = el
-                }}
                 onClick={() => void tap()}
                 className={cn(
-                  'nav-dock-item relative z-10 flex w-14 flex-col items-center justify-center',
-                  'h-14 shrink-0 rounded-full',
-                  'transition-colors duration-300',
-                  active ? 'text-[var(--accent-fg)]' : 'text-muted hover:text-[var(--fg)]',
+                  'relative flex flex-1 flex-col items-center justify-center gap-0.5 min-w-0',
+                  'text-[10px] font-medium',
+                  active ? 'text-[var(--fg)]' : 'text-[var(--fg-muted)]',
                 )}
-                aria-label={item.label}
               >
-                <Icon
-                  size={22}
-                  strokeWidth={active ? 2 : 1.75}
-                  className={cn(
-                    'transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]',
-                    active && '-translate-y-0.5 scale-105',
-                  )}
-                />
-                <span
-                  className={cn(
-                    'text-[9px] font-semibold tracking-wide leading-none mt-0.5',
-                    'transition-[opacity,transform,max-height] duration-300',
-                    active
-                      ? 'opacity-100 translate-y-0 max-h-3'
-                      : 'opacity-0 -translate-y-1 max-h-0 overflow-hidden',
-                  )}
-                >
-                  {item.label}
-                </span>
+                {active && (
+                  <span
+                    aria-hidden
+                    className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-[var(--fg)]"
+                  />
+                )}
+                <Icon size={22} strokeWidth={1.75} />
+                <span>{item.label}</span>
               </NavLink>
             )
           })}
 
           <button
             type="button"
-            ref={(el) => {
-              itemRefs.current[items.length] = el
-            }}
             onClick={() => {
               void tap()
               setMoreOpen((v) => !v)
             }}
             className={cn(
-              'nav-dock-item relative z-10 flex w-14 flex-col items-center justify-center',
-              'h-14 shrink-0 rounded-full',
-              'transition-colors duration-300',
-              moreOpen || showMorePill
-                ? 'text-[var(--accent-fg)]'
-                : 'text-muted hover:text-[var(--fg)]',
+              'relative flex flex-1 flex-col items-center justify-center gap-0.5 min-w-0',
+              'text-[10px] font-medium',
+              moreOpen || moreActive ? 'text-[var(--fg)]' : 'text-[var(--fg-muted)]',
             )}
             aria-expanded={moreOpen}
-            aria-label="More destinations"
+            aria-label="More"
           >
-            <Ellipsis
-              size={22}
-              strokeWidth={moreOpen || showMorePill ? 2 : 1.75}
-              className={cn(
-                'transition-transform duration-300',
-                moreOpen && 'rotate-90',
-              )}
-            />
-            <span
-              className={cn(
-                'text-[9px] font-semibold tracking-wide leading-none mt-0.5',
-                moreOpen || showMorePill
-                  ? 'opacity-100 max-h-3'
-                  : 'opacity-0 max-h-0 overflow-hidden',
-              )}
-            >
-              More
-            </span>
+            {(moreOpen || moreActive) && (
+              <span
+                aria-hidden
+                className="absolute top-0 left-1/2 h-0.5 w-8 -translate-x-1/2 rounded-full bg-[var(--fg)]"
+              />
+            )}
+            <Menu size={22} strokeWidth={1.75} />
+            <span>More</span>
           </button>
-        </nav>
-      </div>
+        </div>
+      </nav>
     </>
   )
 }
 
 export function FloatingTopBar() {
   return (
-    <header className="sticky top-0 z-30 flex justify-center px-3 sm:px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pointer-events-none bg-[var(--bg)]/95">
-      <div className="pointer-events-auto float-dock w-full max-w-6xl flex items-center justify-between gap-2 sm:gap-3 rounded-2xl px-3 sm:px-4 py-2 sm:py-2.5">
-        <NavLink to="/" end className="min-w-0" onClick={() => void tap()} aria-label="Priora home">
-          <BrandWordmark markSize={26} />
+    <header className="sticky top-0 z-30 border-b border-[var(--border)] bg-[var(--card)] pt-[env(safe-area-inset-top)]">
+      <div className="mx-auto flex h-12 max-w-6xl items-center justify-between gap-3 px-3 sm:px-6 lg:px-8">
+        <NavLink to="/" end onClick={() => void tap()} aria-label="Priora home" className="min-w-0">
+          <BrandWordmark markSize={24} />
         </NavLink>
         <NavLink
           to="/search"
           onClick={() => void tap()}
-          className="p-2 sm:p-2.5 rounded-xl text-muted hover:bg-accent-soft hover:text-[var(--fg)] transition active:scale-95"
+          className="flex h-9 w-9 items-center justify-center rounded-xl text-muted hover:bg-accent-soft hover:text-[var(--fg)] transition"
           aria-label="Search"
         >
-          <Search size={20} strokeWidth={1.75} />
+          <Search size={18} strokeWidth={1.75} />
         </NavLink>
       </div>
     </header>
