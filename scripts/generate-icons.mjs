@@ -24,11 +24,15 @@ async function raster(svgName, outName, size, { background } = {}) {
 
 async function rasterOg() {
   const svg = await readFile(path.join(pub, 'og.svg'))
-  await sharp(svg, { density: 150 })
-    .resize(1200, 630)
-    .png()
-    .toFile(path.join(pub, 'og-image.png'))
+  const base = sharp(svg, { density: 150 }).resize(1200, 630)
+  await base.clone().png().toFile(path.join(pub, 'og-image.png'))
   console.log('wrote og-image.png 1200x630')
+  // WhatsApp prefers JPEG under ~300KB
+  await base
+    .clone()
+    .jpeg({ quality: 85, mozjpeg: true })
+    .toFile(path.join(pub, 'og-image.jpg'))
+  console.log('wrote og-image.jpg 1200x630')
 }
 
 async function writeAndroidIcon(size, folder) {
