@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-label="Priora">
+  <defs>
+    <linearGradient id="glass" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.18"/>
+      <stop offset="55%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.1"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="96" y1="72" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <!-- App tile -->
+  <rect width="512" height="512" rx="118" fill="#0a0a0a"/>
+  <rect x="18" y="18" width="476" height="476" rx="104" fill="url(#glass)" stroke="rgba(255,255,255,0.22)" stroke-width="2"/>
+  <path d="M118 96h276a40 40 0 0 1 40 40v48H78v-48a40 40 0 0 1 40-40Z" fill="url(#sheen)" opacity="0.55"/>
+
+  <!-- Priority bars rising into a focus peak -->
+  <g fill="#fafafa">
+    <rect x="128" y="292" width="56" height="112" rx="18"/>
+    <rect x="212" y="236" width="56" height="168" rx="18"/>
+    <rect x="296" y="172" width="56" height="232" rx="18"/>
+    <!-- Next / focus tip -->
+    <circle cx="380" cy="156" r="28"/>
+  </g>
+</svg>

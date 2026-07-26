@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f7f7f7"/>
+      <stop offset="50%" stop-color="#e8e8e8"/>
+      <stop offset="100%" stop-color="#d4d4d4"/>
+    </linearGradient>
+    <radialGradient id="blobA" cx="180" cy="120" r="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blobB" cx="980" cy="520" r="380" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#000000" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#blobA)"/>
+  <rect width="1200" height="630" fill="url(#blobB)"/>
+  <g transform="translate(110 175)">
+    <rect width="280" height="280" rx="64" fill="#0a0a0a"/>
+    <rect x="70" y="160" width="30" height="62" rx="10" fill="#fafafa"/>
+    <rect x="116" y="128" width="30" height="94" rx="10" fill="#fafafa"/>
+    <rect x="162" y="92" width="30" height="130" rx="10" fill="#fafafa"/>
+    <circle cx="222" cy="84" r="16" fill="#fafafa"/>
+  </g>
+  <text x="450" y="295" fill="#0a0a0a" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="92" font-weight="900">Priora</text>
+  <text x="450" y="360" fill="#525252" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="500">What matters next</text>
+  <text x="450" y="418" fill="#737373" font-family="Arial, Helvetica, sans-serif" font-size="24">Private - Offline - Local productivity</text>
+</svg>

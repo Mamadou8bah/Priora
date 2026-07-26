@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" role="img" aria-label="Priora">
+  <!-- Maskable: content kept inside ~66% safe zone -->
+  <rect width="512" height="512" fill="#0a0a0a"/>
+  <g transform="translate(96 96)">
+    <rect width="320" height="320" rx="74" fill="#141414"/>
+    <rect x="80" y="183" width="35" height="70" rx="11" fill="#fafafa"/>
+    <rect x="133" y="148" width="35" height="105" rx="11" fill="#fafafa"/>
+    <rect x="186" y="108" width="35" height="145" rx="11" fill="#fafafa"/>
+    <circle cx="255" cy="98" r="18" fill="#fafafa"/>
+  </g>
+</svg>
